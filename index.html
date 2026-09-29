@@ -1,0 +1,1214 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>العمليات على المصفوفات - إعداد عائض الحربي</title>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Google Fonts Tajawal -->
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;900&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Tajawal', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        /* تنسيق أقواس المصفوفات الرياضية */
+        .matrix-bracket {
+            position: relative;
+            padding: 0.35rem 0.6rem;
+        }
+        @media (min-width: 640px) {
+            .matrix-bracket {
+                padding: 0.5rem 1rem;
+            }
+        }
+        .matrix-bracket::before, .matrix-bracket::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 8px;
+            border: 3px solid #2563eb;
+            transition: border-color 0.3s ease;
+        }
+        @media (min-width: 640px) {
+            .matrix-bracket::before, .matrix-bracket::after {
+                width: 10px;
+                border-width: 4px;
+            }
+        }
+        .matrix-bracket::before {
+            left: 0;
+            border-right: none;
+            border-radius: 8px 0 0 8px;
+        }
+        .matrix-bracket::after {
+            right: 0;
+            border-left: none;
+            border-radius: 0 8px 8px 0;
+        }
+        .matrix-bracket-result::before, .matrix-bracket-result::after {
+            border-color: #059669; /* أخضر ناصع */
+        }
+        .matrix-bracket-exercise::before, .matrix-bracket-exercise::after {
+            border-color: #d97706; /* عنبري */
+        }
+
+        /* إزالة أسهم حقول الأعداد للأناقة وتحسين إدخال اللمس */
+        input[type=number]::-webkit-inner-spin-button, 
+        input[type=number]::-webkit-outer-spin-button { 
+            -webkit-appearance: none; 
+            margin: 0; 
+        }
+        input[type=number] {
+            -moz-appearance: textfield;
+            font-size: 16px !important; /* لمنع التكبير التلقائي في iOS */
+        }
+
+        /* شريط التمرير المخصص */
+        .custom-scrollbar::-webkit-scrollbar {
+            height: 6px;
+            width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: rgba(15, 23, 42, 0.2);
+            border-radius: 10px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #475569;
+            border-radius: 10px;
+        }
+
+        /* إخفاء شريط التمرير للتبويبات على الجوال */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        /* Dynamic High-Contrast Projector Mode Override */
+        body.projector-mode {
+            background-color: #f8fafc !important;
+            color: #0f172a !important;
+        }
+        body.projector-mode header {
+            background-color: #ffffff !important;
+            border-bottom-color: #cbd5e1 !important;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08) !important;
+        }
+        body.projector-mode .projector-card {
+            background-color: #ffffff !important;
+            border-color: #94a3b8 !important;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05) !important;
+            color: #0f172a !important;
+        }
+        body.projector-mode .projector-inner-card {
+            background-color: #f1f5f9 !important;
+            border-color: #cbd5e1 !important;
+            color: #0f172a !important;
+        }
+        body.projector-mode input {
+            background-color: #ffffff !important;
+            color: #0284c7 !important;
+            border-color: #64748b !important;
+            font-weight: 800 !important;
+        }
+        body.projector-mode input:focus {
+            border-color: #0284c7 !important;
+            box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.25) !important;
+        }
+        body.projector-mode select {
+            background-color: #ffffff !important;
+            color: #0f172a !important;
+            border-color: #64748b !important;
+            font-weight: 700 !important;
+        }
+        body.projector-mode .text-slate-400, body.projector-mode .text-slate-300 {
+            color: #334155 !important;
+        }
+        body.projector-mode .text-blue-400 {
+            color: #1d4ed8 !important;
+        }
+        body.projector-mode .text-amber-400 {
+            color: #b45309 !important;
+        }
+        body.projector-mode .text-emerald-400 {
+            color: #047857 !important;
+        }
+        body.projector-mode .text-rose-400 {
+            color: #be123c !important;
+        }
+        body.projector-mode .matrix-bracket::before, body.projector-mode .matrix-bracket::after {
+            border-color: #1d4ed8 !important;
+            border-width: 4px !important;
+        }
+        body.projector-mode .matrix-bracket-result::before, body.projector-mode .matrix-bracket-result::after {
+            border-color: #047857 !important;
+        }
+        body.projector-mode .matrix-bracket-exercise::before, body.projector-mode .matrix-bracket-exercise::after {
+            border-color: #b45309 !important;
+        }
+        body.projector-mode .step-badge {
+            background-color: #e2e8f0 !important;
+            border-color: #cbd5e1 !important;
+            color: #0f172a !important;
+        }
+    </style>
+</head>
+<body id="main-body" class="bg-slate-950 text-slate-100 min-h-screen flex flex-col antialiased selection:bg-blue-600 selection:text-white">
+
+    <header class="bg-slate-900 border-b border-slate-800 p-3 sm:p-4 shadow-lg sticky top-0 z-50 backdrop-blur-md bg-slate-900/95 transition-colors">
+        <div class="max-w-7xl mx-auto flex flex-col lg:flex-row justify-between items-center gap-3">
+            
+            <!-- Logo & Title Header -->
+            <div class="flex items-center justify-between w-full lg:w-auto gap-3">
+                <div class="flex items-center gap-2.5 sm:gap-3">
+                    <div class="bg-blue-600 p-2 sm:p-2.5 rounded-2xl text-white font-bold text-xl sm:text-2xl shadow-lg shadow-blue-600/30 flex items-center justify-center shrink-0">🧮</div>
+                    <div>
+                        <h1 class="text-base sm:text-xl font-black tracking-wide leading-tight">العمليات على المصفوفات</h1>
+                        <p class="text-[11px] sm:text-xs font-bold text-amber-500 mt-0.5">إعداد عائض الحربي</p>
+                    </div>
+                </div>
+
+                <!-- Projector Mode Switcher Toggle Button -->
+                <button onclick="toggleProjectorMode()" id="btn-projector-toggle" class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-500 font-bold text-xs hover:bg-amber-500 hover:text-slate-950 transition-all active:scale-95 shadow-sm">
+                    <span id="projector-icon">📽️</span>
+                    <span id="projector-text">وضع البروجكتر (عالي التباين)</span>
+                </button>
+            </div>
+
+            <!-- Tabs Navigation -->
+            <div class="w-full lg:w-auto overflow-x-auto no-scrollbar py-0.5">
+                <div class="flex items-center gap-1.5 sm:gap-2 min-w-max justify-center">
+                    <button onclick="switchTab('calculator')" id="btn-calculator" class="px-3.5 sm:px-4 py-2 rounded-xl font-bold text-xs sm:text-sm transition-all bg-blue-600 text-white shadow-md active:scale-95">الحاسبة التفاعلية</button>
+                    <button onclick="switchTab('exercises')" id="btn-exercises" class="px-3.5 sm:px-4 py-2 rounded-xl font-bold text-xs sm:text-sm transition-all bg-slate-800 text-slate-300 hover:bg-slate-700 active:scale-95 flex items-center gap-1">
+                        <span>بنك التدريبات المولّد</span>
+                        <span class="bg-emerald-500/20 text-emerald-400 text-[10px] px-1.5 py-0.2 rounded-full font-mono">تلقائي ✨</span>
+                    </button>
+                    <button onclick="switchTab('tutorial')" id="btn-tutorial" class="px-3.5 sm:px-4 py-2 rounded-xl font-bold text-xs sm:text-sm transition-all bg-slate-800 text-slate-300 hover:bg-slate-700 active:scale-95">شرح الدرس المفصل</button>
+                </div>
+            </div>
+
+        </div>
+    </header>
+
+    <main class="flex-grow max-w-7xl w-full mx-auto p-3 sm:p-6 space-y-5 sm:space-y-6">
+
+        <!-- Calculator Tab -->
+        <div id="tab-calculator" class="space-y-5 sm:space-y-6">
+            
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 sm:gap-6 items-start">
+                
+                <!-- Steps & Result Panel -->
+                <div class="lg:col-span-7 space-y-4 order-2 lg:order-1">
+                    
+                    <!-- Result & Interactive Steps Section -->
+                    <div id="result-section" class="hidden projector-card bg-slate-900 p-4 sm:p-5 rounded-2xl border border-slate-800 shadow-xl space-y-4 sm:space-y-5">
+                        
+                        <!-- Header with Action Buttons -->
+                        <div class="border-b border-slate-800/80 pb-3 flex flex-col xs:flex-row justify-between items-start xs:items-center gap-2">
+                            <h3 class="text-sm sm:text-base font-extrabold text-amber-500 flex items-center gap-2">
+                                <span>📊</span>
+                                <span>لوحة الخطوات التفاعلية والناتج</span>
+                            </h3>
+                            <div class="flex items-center gap-2 w-full xs:w-auto justify-end">
+                                <button onclick="autoFillStepInputs()" class="text-xs bg-blue-600 hover:bg-blue-500 text-white px-3 py-1.5 rounded-lg transition-all font-bold flex items-center gap-1 shadow-md active:scale-95">
+                                    <span>📥</span>
+                                    <span>تعبئة تلقائية</span>
+                                </button>
+                                <button onclick="copyResult()" class="text-xs bg-slate-800 hover:bg-slate-700 text-slate-200 px-3 py-1.5 rounded-lg transition-all border border-slate-700 font-bold active:scale-95">نسخ الناتج</button>
+                            </div>
+                        </div>
+
+                        <!-- Step-by-step Interactive Explanation -->
+                        <div class="projector-inner-card bg-slate-950 p-3 sm:p-4 rounded-xl border border-slate-800 text-sm space-y-3">
+                            <div class="border-b border-slate-800/80 pb-2 flex justify-between items-center">
+                                <h4 class="font-extrabold text-blue-500 text-xs flex items-center gap-1.5">
+                                    <span>✏️</span>
+                                    <span>أدخل الأعداد في حقول الخطوات للتأكد من فهمك:</span>
+                                </h4>
+                                <span class="text-[11px] text-slate-400 font-bold">حساب فوري live ⚡</span>
+                            </div>
+                            <div id="steps-container" class="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-2.5 text-slate-300 max-h-[380px] sm:max-h-[460px] overflow-y-auto custom-scrollbar pl-1" style="direction: ltr; text-align: left;"></div>
+                        </div>
+
+                        <!-- Result Matrix Display View -->
+                        <div class="projector-inner-card flex flex-col items-center justify-center p-4 bg-slate-950/80 rounded-xl border border-slate-800 overflow-x-auto custom-scrollbar w-full" style="direction: ltr;">
+                            <span id="result-dim-label" class="text-xs text-emerald-500 mb-2.5 font-mono font-extrabold">Result Matrix C (3 × 3)</span>
+                            <div id="matrix-result-view" class="grid gap-2 p-2 matrix-bracket matrix-bracket-result max-w-full overflow-x-auto custom-scrollbar"></div>
+                        </div>
+
+                    </div>
+
+                    <!-- Initial Placeholder State -->
+                    <div id="initial-placeholder" class="projector-card bg-slate-900/70 p-6 sm:p-10 rounded-2xl border border-dashed border-slate-700 text-center space-y-3">
+                        <div class="text-4xl sm:text-5xl">🧮</div>
+                        <h3 class="font-extrabold text-slate-200 text-sm sm:text-lg">جاهز لبدء الحل التفاعلي لعرض البروجكتر؟</h3>
+                        <p class="text-xs sm:text-sm text-slate-400 max-w-md mx-auto leading-relaxed">
+                            قم بضبط رتبة المصفوفة ومدخلاتها من اللوحة، ثم اضغط على <strong>"عرض خطوات الحل والناتج"</strong> لبدء الحساب التفاعلي أمام الطلاب بوضوح تام!
+                        </p>
+                    </div>
+
+                </div>
+
+                <!-- Input Matrices & Controls Panel -->
+                <div class="lg:col-span-5 space-y-4 lg:sticky lg:top-20 z-30 order-1 lg:order-2">
+                    <div class="projector-card bg-slate-900 p-3.5 sm:p-5 rounded-2xl border border-slate-800 shadow-xl space-y-4">
+                        
+                        <!-- Header Bar -->
+                        <div class="flex items-center justify-between border-b border-slate-800 pb-2.5">
+                            <h2 class="text-xs sm:text-sm font-extrabold text-blue-400 flex items-center gap-2">
+                                <span>📥</span>
+                                <span>إعدادات ومدخلات المصفوفات</span>
+                            </h2>
+                            <span class="text-[10px] bg-blue-950/80 text-blue-300 px-2 py-0.5 rounded-full border border-blue-800/60 font-extrabold">تحكم كامل ⚙️</span>
+                        </div>
+
+                        <!-- Select Controls -->
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5" style="direction: ltr;">
+                            <div style="direction: rtl;">
+                                <label class="block text-[11px] sm:text-xs font-bold text-slate-400 mb-1">نوع العملية:</label>
+                                <select id="operation-type" onchange="changeOperation()" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-2.5 py-2 text-xs focus:outline-none focus:border-blue-500 font-bold text-slate-200">
+                                    <option value="add">جمع (A + B)</option>
+                                    <option value="subtract">طرح (A - B)</option>
+                                    <option value="scalar">ضرب ثابت (k × A)</option>
+                                </select>
+                            </div>
+
+                            <div style="direction: rtl;">
+                                <label class="block text-[11px] sm:text-xs font-bold text-slate-400 mb-1">الصفوف (m):</label>
+                                <select id="matrix-rows" onchange="updateMatrixDimensions()" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-2 py-2 text-xs focus:outline-none focus:border-blue-500 font-bold text-slate-200">
+                                    <option value="1">1 صف</option>
+                                    <option value="2">2 صفوف</option>
+                                    <option value="3" selected>3 صفوف</option>
+                                    <option value="4">4 صفوف</option>
+                                </select>
+                            </div>
+
+                            <div style="direction: rtl;">
+                                <label class="block text-[11px] sm:text-xs font-bold text-slate-400 mb-1">الأعمدة (n):</label>
+                                <select id="matrix-cols" onchange="updateMatrixDimensions()" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-2 py-2 text-xs focus:outline-none focus:border-blue-500 font-bold text-slate-200">
+                                    <option value="1">1 عمود</option>
+                                    <option value="2">2 أعمدة</option>
+                                    <option value="3" selected>3 أعمدة</option>
+                                    <option value="4">4 أعمدة</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Matrix Inputs Container -->
+                        <div id="matrix-inputs-wrapper" class="projector-inner-card flex flex-wrap sm:flex-nowrap gap-2.5 justify-center items-center w-full py-2.5 overflow-x-auto custom-scrollbar bg-slate-950/80 p-2.5 sm:p-3 rounded-xl border border-slate-800 max-w-full" style="direction: ltr;">
+                            
+                            <!-- Scalar Input -->
+                            <div id="scalar-container" class="hidden flex-col items-center justify-center p-2 bg-slate-900 border border-amber-800/60 rounded-xl shrink-0">
+                                <label class="block text-[10px] font-bold text-amber-500 mb-1">الثابت k</label>
+                                <input type="number" id="scalar-value" value="3" class="w-10 h-10 sm:w-12 sm:h-11 bg-slate-950 border-2 border-amber-500 rounded-lg text-center text-sm sm:text-base font-black text-amber-400 focus:outline-none">
+                                <span class="text-base font-black text-slate-400 mt-0.5">×</span>
+                            </div>
+
+                            <!-- Matrix A -->
+                            <div class="projector-inner-card bg-slate-900 p-2.5 sm:p-3 rounded-xl border border-slate-800 flex flex-col items-center justify-center relative shrink-0 max-w-full overflow-x-auto custom-scrollbar">
+                                <div class="flex justify-between items-center w-full mb-1.5 px-1 gap-2">
+                                    <h3 id="label-matrix-a" class="text-xs font-bold text-blue-400">Matrix A</h3>
+                                    <span id="badge-dim-a" class="text-[10px] bg-slate-800 text-slate-300 px-1.5 py-0.5 rounded font-mono font-bold">3 × 3</span>
+                                </div>
+                                <div id="matrix-a-inputs" class="grid gap-1 sm:gap-1.5 p-1 matrix-bracket"></div>
+                            </div>
+
+                            <!-- Operator Symbol -->
+                            <div id="operator-symbol" class="text-xl sm:text-2xl font-black text-blue-500 px-1 shrink-0">+</div>
+
+                            <!-- Matrix B Container -->
+                            <div id="matrix-b-wrapper" class="projector-inner-card bg-slate-900 p-2.5 sm:p-3 rounded-xl border border-slate-800 flex flex-col items-center justify-center relative shrink-0 max-w-full overflow-x-auto custom-scrollbar">
+                                <div class="flex justify-between items-center w-full mb-1.5 px-1 gap-2">
+                                    <h3 id="label-matrix-b" class="text-xs font-bold text-emerald-400">Matrix B</h3>
+                                    <span id="badge-dim-b" class="text-[10px] bg-slate-800 text-slate-300 px-1.5 py-0.5 rounded font-mono font-bold">3 × 3</span>
+                                </div>
+                                <div id="matrix-b-inputs" class="grid gap-1 sm:gap-1.5 p-1 matrix-bracket"></div>
+                            </div>
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="flex justify-between items-center gap-2 pt-2 border-t border-slate-800">
+                            <button onclick="loadExample()" class="bg-emerald-600 hover:bg-emerald-500 text-white px-3 py-2 rounded-xl text-xs font-bold transition-all shadow-md flex items-center gap-1 active:scale-95 shrink-0">
+                                <span>💡</span>
+                                <span>قيم عشوائية</span>
+                            </button>
+                            <button onclick="calculateMatrix()" class="bg-blue-600 hover:bg-blue-500 text-white px-3.5 sm:px-5 py-2 rounded-xl text-xs font-extrabold transition-all shadow-lg shadow-blue-600/30 flex items-center gap-1.5 active:scale-95">
+                                <span>عرض الخطوات والناتج</span>
+                                <span>✨</span>
+                            </button>
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Dynamic Exercises & Tests Tab -->
+        <div id="tab-exercises" class="hidden space-y-6">
+            <div class="projector-card bg-slate-900 p-4 sm:p-6 rounded-2xl border border-slate-800 shadow-xl space-y-5 sm:space-y-6">
+                
+                <!-- Dynamic Header & Generator Bar -->
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-slate-800 pb-4">
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <h2 class="text-lg sm:text-xl font-extrabold text-blue-400">بنك التدريبات التوليدي التفاعلي</h2>
+                            <span class="bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 px-2.5 py-0.5 rounded-full text-xs font-bold">توليد لا نهائي ♾️</span>
+                        </div>
+                        <p class="text-xs text-slate-400 mt-1">اضغط "توليد مسألة جديدة" في أي وقت لتوليد أرقام مختلفة تلقائياً واختبار طلابك بسهولة.</p>
+                    </div>
+
+                    <!-- Score Tracker & Quick Generator -->
+                    <div class="flex items-center gap-3 w-full md:w-auto justify-between md:justify-end">
+                        <div class="projector-inner-card bg-slate-950 px-3.5 py-1.5 rounded-xl border border-slate-800 text-xs font-bold flex items-center gap-2">
+                            <span class="text-amber-500">🏆 المسائل المحلولة:</span>
+                            <span id="score-counter" class="text-emerald-400 text-sm font-mono font-black">0</span>
+                        </div>
+                        <button onclick="generateRandomExerciseType()" class="bg-amber-600 hover:bg-amber-500 text-white px-3.5 py-2 rounded-xl text-xs font-extrabold transition-all shadow-md flex items-center gap-1.5 active:scale-95 shrink-0">
+                            <span>🎲</span>
+                            <span>مسألة عشوائية جديدة</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Exercise Type Selector & Controls -->
+                <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 projector-inner-card bg-slate-950 p-3 sm:p-4 rounded-xl border border-slate-800">
+                    <div class="flex items-center gap-2 flex-grow">
+                        <label class="text-xs font-extrabold text-slate-300 shrink-0">نوع المسألة:</label>
+                        <select id="exercise-type-select" onchange="onExerciseTypeChange()" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs sm:text-sm focus:outline-none focus:border-blue-500 font-bold text-slate-200">
+                            <option value="add_2x2">1) جمع مصفوفتين (2 × 2)</option>
+                            <option value="sub_2x3">2) طرح مصفوفتين (2 × 3)</option>
+                            <option value="scalar_2x4">3) ضرب عدد ثابت في مصفوفة (2 × 4)</option>
+                            <option value="add_3x3">4) جمع مصفوفتين من الرتبة (3 × 3)</option>
+                            <option value="compound_2x2">5) عملية مركبة (3A - 2B) من الرتبة (2 × 2)</option>
+                            <option value="undefined_dim">6) اختباري - اختلاف الرتبة (تعذر العملية)</option>
+                        </select>
+                    </div>
+
+                    <button onclick="generateCurrentExercise()" class="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-xl text-xs font-black transition-all shadow-md flex items-center justify-center gap-1.5 active:scale-95 shrink-0">
+                        <span>🔄</span>
+                        <span>توليد مسألة جديدة بنفس النوع</span>
+                    </button>
+                </div>
+
+                <!-- Dynamic Exercise Workspace Content -->
+                <div id="exercise-workspace" class="space-y-5"></div>
+
+            </div>
+        </div>
+
+        <!-- Tutorial Tab -->
+        <div id="tab-tutorial" class="hidden space-y-6">
+            <div class="projector-card bg-slate-900 p-4 sm:p-6 rounded-2xl border border-slate-800 shadow-xl space-y-5 sm:space-y-6">
+                <div class="border-b border-slate-800 pb-3 flex flex-col xs:flex-row justify-between items-start xs:items-center gap-2">
+                    <h2 class="text-lg sm:text-xl font-extrabold text-blue-400">شرح درس العمليات على المصفوفات (Operations with Matrices)</h2>
+                    <span class="text-xs text-amber-500 bg-amber-950/60 border border-amber-800/60 px-3 py-1 rounded-full font-bold">إعداد عائض الحربي</span>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
+                    <!-- Card 1 -->
+                    <div class="projector-inner-card bg-slate-950 p-4 sm:p-5 rounded-xl border border-slate-800 space-y-2.5">
+                        <div class="w-9 h-9 rounded-xl bg-blue-600/20 text-blue-400 flex items-center justify-center font-black text-base">1</div>
+                        <h3 class="font-extrabold text-sm sm:text-base text-slate-100">شرط جمع وطرح المصفوفات</h3>
+                        <p class="text-xs text-slate-400 leading-relaxed font-medium">
+                            يمكن جمع مصفوفتين أو طرحهما <strong>إذا وفقط إذا كان لهما الرتبة نفسها ($m \times n$)</strong>. مصفوفة الناتج تكون أيضاً من نفس الرتبة وتنتج من جمع أو طرح العناصر المتناظرة.
+                        </p>
+                        <div class="projector-card bg-slate-900 p-2.5 rounded-lg text-xs font-mono font-bold text-emerald-400 text-center" style="direction: ltr;">
+                            A_{m \times n} \pm B_{m \times n} = C_{m \times n}
+                        </div>
+                    </div>
+
+                    <!-- Card 2 -->
+                    <div class="projector-inner-card bg-slate-950 p-4 sm:p-5 rounded-xl border border-slate-800 space-y-2.5">
+                        <div class="w-9 h-9 rounded-xl bg-purple-600/20 text-purple-400 flex items-center justify-center font-black text-base">2</div>
+                        <h3 class="font-extrabold text-sm sm:text-base text-slate-100">ضرب مصفوفة في عدد ثابت</h3>
+                        <p class="text-xs text-slate-400 leading-relaxed font-medium">
+                            حاصل ضرب مصفوفة $A$ من الرتبة $m \times n$ في عدد ثابت $k$ هي مصفوفة جديدة من <strong>نفس الرتبة ($m \times n$)</strong>، وكل عنصر فيها يساوي العنصر المناظر مضروباً في الثابت $k$.
+                        </p>
+                        <div class="projector-card bg-slate-900 p-2.5 rounded-lg text-xs font-mono font-bold text-purple-400 text-center" style="direction: ltr;">
+                            k \cdot A_{m \times n} = [k \cdot a_{ij}]
+                        </div>
+                    </div>
+
+                    <!-- Card 3 -->
+                    <div class="projector-inner-card bg-slate-950 p-4 sm:p-5 rounded-xl border border-slate-800 space-y-2.5">
+                        <div class="w-9 h-9 rounded-xl bg-amber-600/20 text-amber-400 flex items-center justify-center font-black text-base">3</div>
+                        <h3 class="font-extrabold text-sm sm:text-base text-slate-100">خصائص جمع المصفوفات</h3>
+                        <p class="text-xs text-slate-400 leading-relaxed font-medium">
+                            تخضع جمع المصفوفات لخاصية الإبدال والتجميع والتوزيع عند التساوي في الرتب:
+                        </p>
+                        <div class="projector-card bg-slate-900 p-2.5 rounded-lg text-xs font-mono font-bold text-amber-400 space-y-1 text-center" style="direction: ltr;">
+                            <div>A + B = B + A</div>
+                            <div>k(A + B) = kA + kB</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="projector-inner-card bg-blue-950/40 border border-blue-900/60 p-3.5 sm:p-4 rounded-xl flex items-start gap-3">
+                    <span class="text-xl sm:text-2xl">💡</span>
+                    <div class="text-xs text-blue-200 leading-relaxed font-medium">
+                        <strong>إرشادات العرض الصفي والبروجكتر:</strong> استخدم زر <strong>"📽️ وضع البروجكتر"</strong> في الشريحة العلوية لتفعيل التباين العالي الذي يجعل النص والأرقام ناصعة الرؤية لجميع الطلاب على الشاشات التفاعلية والبروجكتر.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <script>
+        let audioCtx = null;
+        let isProjectorMode = false;
+        let solvedExercisesCount = 0;
+        let currentExerciseData = null;
+
+        function getAudioContext() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+            return audioCtx;
+        }
+
+        // Toggles High-Contrast Light Mode for classroom projectors
+        function toggleProjectorMode() {
+            isProjectorMode = !isProjectorMode;
+            const body = document.getElementById('main-body');
+            const icon = document.getElementById('projector-icon');
+            const text = document.getElementById('projector-text');
+
+            if (isProjectorMode) {
+                body.classList.add('projector-mode');
+                icon.textContent = "☀️";
+                text.textContent = "إلغاء وضع البروجكتر (النمط الداكن)";
+                showToast("تم تفعيل وضع البروجكتر الناصع بعالي التباين ☀️", "info");
+            } else {
+                body.classList.remove('projector-mode');
+                icon.textContent = "📽️";
+                text.textContent = "وضع البروجكتر (عالي التباين)";
+                showToast("تم العودة للنمط الداكن القياسي 🌙", "info");
+            }
+        }
+
+        function playSuccessSound() {
+            try {
+                const ctx = getAudioContext();
+                const now = ctx.currentTime;
+
+                const notes = [523.25, 659.25, 783.99, 1046.50];
+                notes.forEach((freq, idx) => {
+                    const osc = ctx.createOscillator();
+                    const gain = ctx.createGain();
+                    osc.type = 'triangle';
+                    osc.frequency.value = freq;
+
+                    gain.gain.setValueAtTime(0, now + idx * 0.08);
+                    gain.gain.linearRampToValueAtTime(0.2, now + idx * 0.08 + 0.02);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.08 + 0.45);
+
+                    osc.connect(gain);
+                    gain.connect(ctx.destination);
+
+                    osc.start(now + idx * 0.08);
+                    osc.stop(now + idx * 0.08 + 0.5);
+                });
+            } catch(e) {
+                console.log("Audio not enabled yet", e);
+            }
+        }
+
+        function playErrorSound() {
+            try {
+                const ctx = getAudioContext();
+                const now = ctx.currentTime;
+
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(180, now);
+                osc.frequency.linearRampToValueAtTime(110, now + 0.35);
+
+                gain.gain.setValueAtTime(0.18, now);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
+
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+
+                osc.start(now);
+                osc.stop(now + 0.35);
+            } catch(e) {
+                console.log("Audio not enabled yet", e);
+            }
+        }
+
+        function switchTab(tabName) {
+            const tabs = ['calculator', 'exercises', 'tutorial'];
+            tabs.forEach(t => {
+                document.getElementById(`tab-${t}`).classList.add('hidden');
+                document.getElementById(`btn-${t}`).className = "px-3.5 sm:px-4 py-2 rounded-xl font-bold text-xs sm:text-sm transition-all bg-slate-800 text-slate-300 hover:bg-slate-700 active:scale-95";
+            });
+
+            document.getElementById(`tab-${tabName}`).classList.remove('hidden');
+            document.getElementById(`btn-${tabName}`).className = "px-3.5 sm:px-4 py-2 rounded-xl font-bold text-xs sm:text-sm transition-all bg-blue-600 text-white shadow-md active:scale-95";
+
+            if (tabName === 'exercises' && !currentExerciseData) {
+                generateCurrentExercise();
+            }
+        }
+
+        function changeOperation() {
+            const opType = document.getElementById('operation-type').value;
+            const scalarContainer = document.getElementById('scalar-container');
+            const matrixBWrapper = document.getElementById('matrix-b-wrapper');
+            const labelMatrixA = document.getElementById('label-matrix-a');
+            const operatorSymbol = document.getElementById('operator-symbol');
+
+            if (opType === 'scalar') {
+                scalarContainer.classList.remove('hidden');
+                scalarContainer.classList.add('flex');
+                matrixBWrapper.classList.add('hidden');
+                labelMatrixA.textContent = "Matrix A";
+                if(operatorSymbol) operatorSymbol.classList.add('hidden');
+            } else {
+                scalarContainer.classList.add('hidden');
+                scalarContainer.classList.remove('flex');
+                matrixBWrapper.classList.remove('hidden');
+                if(operatorSymbol) operatorSymbol.classList.remove('hidden');
+                
+                if (opType === 'add') {
+                    labelMatrixA.textContent = "Matrix A";
+                    if(operatorSymbol) operatorSymbol.textContent = "+";
+                } else {
+                    labelMatrixA.textContent = "Matrix A";
+                    if(operatorSymbol) operatorSymbol.textContent = "-";
+                }
+            }
+            document.getElementById('result-section').classList.add('hidden');
+            document.getElementById('initial-placeholder').classList.remove('hidden');
+        }
+
+        function updateMatrixDimensions() {
+            const rows = parseInt(document.getElementById('matrix-rows').value);
+            const cols = parseInt(document.getElementById('matrix-cols').value);
+            
+            document.getElementById('badge-dim-a').textContent = `${rows} × ${cols}`;
+            document.getElementById('badge-dim-b').textContent = `${rows} × ${cols}`;
+
+            renderMatrixInputs('matrix-a-inputs', rows, cols, 'a');
+            renderMatrixInputs('matrix-b-inputs', rows, cols, 'b');
+            document.getElementById('result-section').classList.add('hidden');
+            document.getElementById('initial-placeholder').classList.remove('hidden');
+        }
+
+        function renderMatrixInputs(containerId, rows, cols, prefix) {
+            const container = document.getElementById(containerId);
+            container.style.gridTemplateColumns = `repeat(${cols}, minmax(0, 1fr))`;
+            container.innerHTML = '';
+
+            for (let i = 0; i < rows; i++) {
+                for (let j = 0; j < cols; j++) {
+                    const input = document.createElement('input');
+                    input.type = 'number';
+                    input.value = Math.floor(Math.random() * 12) - 5;
+                    input.id = `${prefix}_${i}_${j}`;
+                    input.className = "w-9 h-9 xs:w-10 xs:h-10 sm:w-11 sm:h-11 bg-slate-950 border border-slate-700 rounded-lg sm:rounded-xl text-center font-black text-xs sm:text-base focus:outline-none focus:border-blue-500 transition-all shadow-inner text-blue-300 font-mono p-0";
+                    container.appendChild(input);
+                }
+            }
+        }
+
+        function loadExample() {
+            const rows = parseInt(document.getElementById('matrix-rows').value);
+            const cols = parseInt(document.getElementById('matrix-cols').value);
+            const opType = document.getElementById('operation-type').value;
+
+            for (let i = 0; i < rows; i++) {
+                for (let j = 0; j < cols; j++) {
+                    const elemA = document.getElementById(`a_${i}_${j}`);
+                    if (elemA) elemA.value = Math.floor(Math.random() * 14) - 6;
+
+                    const elemB = document.getElementById(`b_${i}_${j}`);
+                    if (elemB && opType !== 'scalar') elemB.value = Math.floor(Math.random() * 12) - 4;
+                }
+            }
+
+            if (opType === 'scalar') {
+                document.getElementById('scalar-value').value = Math.floor(Math.random() * 6) + 2;
+            }
+
+            calculateMatrix();
+        }
+
+        function calculateMatrix() {
+            const rows = parseInt(document.getElementById('matrix-rows').value);
+            const cols = parseInt(document.getElementById('matrix-cols').value);
+            const opType = document.getElementById('operation-type').value;
+            const resultSection = document.getElementById('result-section');
+            const initialPlaceholder = document.getElementById('initial-placeholder');
+            const stepsContainer = document.getElementById('steps-container');
+            const matrixResultView = document.getElementById('matrix-result-view');
+            const resultDimLabel = document.getElementById('result-dim-label');
+
+            stepsContainer.innerHTML = '';
+            matrixResultView.style.gridTemplateColumns = `repeat(${cols}, minmax(0, 1fr))`;
+            matrixResultView.innerHTML = '';
+            resultDimLabel.textContent = `Result Matrix C (${rows} × ${cols})`;
+
+            const opSymbol = opType === 'add' ? '+' : opType === 'subtract' ? '-' : '×';
+
+            for (let i = 0; i < rows; i++) {
+                for (let j = 0; j < cols; j++) {
+                    const cellId = `result_cell_${i}_${j}`;
+
+                    let stepText = document.createElement('div');
+                    stepText.className = "p-2 rounded-xl projector-card bg-slate-900 border border-slate-800 flex flex-wrap items-center justify-between text-xs font-mono gap-1 shadow-sm";
+                    
+                    if (opType === 'scalar') {
+                        stepText.innerHTML = `
+                            <span class="text-slate-400 text-[10px] sm:text-[11px] font-sans font-bold">(${i+1},${j+1}):</span>
+                            <div class="flex items-center gap-1">
+                                <input type="number" id="step_k_${i}_${j}" oninput="updateLiveStep(${i}, ${j})" placeholder="k" class="w-10 sm:w-11 h-7 sm:h-8 bg-slate-950 border border-amber-500/50 rounded-lg text-center text-amber-400 font-black focus:outline-none focus:border-amber-400 p-0 text-xs">
+                                <span class="text-amber-500 font-bold text-xs">×</span>
+                                <input type="number" id="step_a_${i}_${j}" oninput="updateLiveStep(${i}, ${j})" placeholder="A" class="w-10 sm:w-11 h-7 sm:h-8 bg-slate-950 border border-blue-500/50 rounded-lg text-center text-blue-400 font-black focus:outline-none focus:border-blue-400 p-0 text-xs">
+                                <span class="text-slate-400 font-bold text-xs">=</span>
+                                <span id="step_res_${i}_${j}" class="px-1.5 sm:px-2 py-0.5 bg-slate-950 text-slate-500 font-bold rounded-lg border border-slate-800 min-w-[2.5rem] sm:min-w-[3rem] text-center inline-block text-xs">--</span>
+                            </div>
+                        `;
+                    } else {
+                        stepText.innerHTML = `
+                            <span class="text-slate-400 text-[10px] sm:text-[11px] font-sans font-bold">(${i+1},${j+1}):</span>
+                            <div class="flex items-center gap-1">
+                                <input type="number" id="step_a_${i}_${j}" oninput="updateLiveStep(${i}, ${j})" placeholder="A" class="w-10 sm:w-11 h-7 sm:h-8 bg-slate-950 border border-blue-500/50 rounded-lg text-center text-blue-400 font-black focus:outline-none focus:border-blue-400 p-0 text-xs">
+                                <span class="text-slate-300 font-bold text-xs">${opSymbol}</span>
+                                <input type="number" id="step_b_${i}_${j}" oninput="updateLiveStep(${i}, ${j})" placeholder="B" class="w-10 sm:w-11 h-7 sm:h-8 bg-slate-950 border border-emerald-500/50 rounded-lg text-center text-emerald-400 font-black focus:outline-none focus:border-emerald-400 p-0 text-xs">
+                                <span class="text-slate-400 font-bold text-xs">=</span>
+                                <span id="step_res_${i}_${j}" class="px-1.5 sm:px-2 py-0.5 bg-slate-950 text-slate-500 font-bold rounded-lg border border-slate-800 min-w-[2.5rem] sm:min-w-[3rem] text-center inline-block text-xs">--</span>
+                            </div>
+                        `;
+                    }
+                    stepsContainer.appendChild(stepText);
+
+                    const cell = document.createElement('div');
+                    cell.id = cellId;
+                    cell.className = "w-9 h-9 xs:w-10 xs:h-10 sm:w-11 sm:h-11 projector-card bg-slate-900 border border-slate-800 rounded-lg sm:rounded-xl flex items-center justify-center font-black text-sm sm:text-base text-slate-500 shadow-inner font-mono transition-all";
+                    cell.textContent = "?";
+                    matrixResultView.appendChild(cell);
+                }
+            }
+
+            if (initialPlaceholder) initialPlaceholder.classList.add('hidden');
+            resultSection.classList.remove('hidden');
+        }
+
+        function validateInput(inputEl, userVal, expectedVal, defaultStyle) {
+            if (!inputEl) return false;
+            const baseClass = "w-10 sm:w-11 h-7 sm:h-8 rounded-lg text-center font-black focus:outline-none transition-all font-mono text-xs p-0 ";
+            
+            if (inputEl.value === '' || isNaN(userVal)) {
+                inputEl.className = baseClass + "bg-slate-950 border " + defaultStyle;
+                return false;
+            } else if (userVal === expectedVal) {
+                inputEl.className = baseClass + "bg-emerald-950/80 border-2 border-emerald-500 text-emerald-300 shadow-md";
+                return true;
+            } else {
+                inputEl.className = baseClass + "bg-rose-950/80 border-2 border-rose-500 text-rose-300 shadow-md";
+                return false;
+            }
+        }
+
+        function updateLiveStep(i, j) {
+            const opType = document.getElementById('operation-type').value;
+            const resSpan = document.getElementById(`step_res_${i}_${j}`);
+            const cellEl = document.getElementById(`result_cell_${i}_${j}`);
+
+            if (!resSpan || !cellEl) return;
+
+            let res = null;
+            let inputsCorrect = false;
+
+            if (opType === 'scalar') {
+                const kEl = document.getElementById(`step_k_${i}_${j}`);
+                const aEl = document.getElementById(`step_a_${i}_${j}`);
+                const valK = kEl && kEl.value !== '' ? parseFloat(kEl.value) : NaN;
+                const valA = aEl && aEl.value !== '' ? parseFloat(aEl.value) : NaN;
+
+                const actualKEl = document.getElementById('scalar-value');
+                const actualAEl = document.getElementById(`a_${i}_${j}`);
+                const actualK = actualKEl ? parseFloat(actualKEl.value) : NaN;
+                const actualA = actualAEl ? parseFloat(actualAEl.value) : NaN;
+
+                const isKValid = validateInput(kEl, valK, actualK, 'border-amber-500/50 text-amber-400');
+                const isAValid = validateInput(aEl, valA, actualA, 'border-blue-500/50 text-blue-400');
+
+                if (isKValid && isAValid) {
+                    res = valK * valA;
+                    inputsCorrect = true;
+                }
+            } else {
+                const aEl = document.getElementById(`step_a_${i}_${j}`);
+                const bEl = document.getElementById(`step_b_${i}_${j}`);
+                const valA = aEl && aEl.value !== '' ? parseFloat(aEl.value) : NaN;
+                const valB = bEl && bEl.value !== '' ? parseFloat(bEl.value) : NaN;
+
+                const actualAEl = document.getElementById(`a_${i}_${j}`);
+                const actualBEl = document.getElementById(`b_${i}_${j}`);
+                const actualA = actualAEl ? parseFloat(actualAEl.value) : NaN;
+                const actualB = actualBEl ? parseFloat(actualBEl.value) : NaN;
+
+                const isAValid = validateInput(aEl, valA, actualA, 'border-blue-500/50 text-blue-400');
+                const isBValid = validateInput(bEl, valB, actualB, 'border-emerald-500/50 text-emerald-400');
+
+                if (isAValid && isBValid) {
+                    if (opType === 'add') res = valA + valB;
+                    else if (opType === 'subtract') res = valA - valB;
+                    inputsCorrect = true;
+                }
+            }
+
+            if (inputsCorrect && res !== null) {
+                resSpan.textContent = res;
+                resSpan.className = "px-1.5 sm:px-2 py-0.5 bg-emerald-950/90 text-emerald-300 font-black rounded-lg border border-emerald-500 min-w-[2.5rem] sm:min-w-[3rem] text-center inline-block font-mono text-xs shadow-md";
+
+                cellEl.textContent = res;
+                cellEl.className = "w-9 h-9 xs:w-10 xs:h-10 sm:w-11 sm:h-11 projector-card bg-slate-900 border-2 border-emerald-500 text-emerald-400 rounded-lg sm:rounded-xl flex items-center justify-center font-black text-sm sm:text-base shadow-lg shadow-emerald-500/20 font-mono transition-all transform scale-105";
+
+                setTimeout(() => {
+                    if (cellEl) cellEl.classList.remove('scale-105');
+                }, 150);
+
+                checkAllStepsCompleted();
+            } else {
+                resSpan.textContent = "--";
+                resSpan.className = "px-1.5 sm:px-2 py-0.5 bg-slate-950 text-slate-500 font-bold rounded-lg border border-slate-800 min-w-[2.5rem] sm:min-w-[3rem] text-center inline-block font-mono text-xs";
+
+                cellEl.textContent = "?";
+                cellEl.className = "w-9 h-9 xs:w-10 xs:h-10 sm:w-11 sm:h-11 projector-card bg-slate-900 border border-slate-800 rounded-lg sm:rounded-xl flex items-center justify-center font-black text-sm sm:text-base text-slate-500 shadow-inner font-mono transition-all";
+            }
+        }
+
+        function autoFillStepInputs() {
+            const rows = parseInt(document.getElementById('matrix-rows').value);
+            const cols = parseInt(document.getElementById('matrix-cols').value);
+
+            for (let i = 0; i < rows; i++) {
+                for (let j = 0; j < cols; j++) {
+                    const elemA = document.getElementById(`a_${i}_${j}`);
+                    const elemB = document.getElementById(`b_${i}_${j}`);
+                    const scalarVal = document.getElementById('scalar-value');
+
+                    const stepA = document.getElementById(`step_a_${i}_${j}`);
+                    const stepB = document.getElementById(`step_b_${i}_${j}`);
+                    const stepK = document.getElementById(`step_k_${i}_${j}`);
+
+                    if (stepA && elemA) stepA.value = elemA.value;
+                    if (stepB && elemB) stepB.value = elemB.value;
+                    if (stepK && scalarVal) stepK.value = scalarVal.value;
+
+                    updateLiveStep(i, j);
+                }
+            }
+        }
+
+        function checkAllStepsCompleted() {
+            const rows = parseInt(document.getElementById('matrix-rows').value);
+            const cols = parseInt(document.getElementById('matrix-cols').value);
+            let allFilled = true;
+
+            for (let i = 0; i < rows; i++) {
+                for (let j = 0; j < cols; j++) {
+                    const resSpan = document.getElementById(`step_res_${i}_${j}`);
+                    if (!resSpan || resSpan.textContent === '--') {
+                        allFilled = false;
+                        break;
+                    }
+                }
+            }
+
+            if (allFilled) {
+                if (!window.hasAnnouncedComplete) {
+                    window.hasAnnouncedComplete = true;
+                    playSuccessSound();
+                    showToast("أحسنت! تم حساب جميع عناصر مصفوفة الناتج بنجاح 🎉", "success");
+                    setTimeout(() => { window.hasAnnouncedComplete = false; }, 3000);
+                }
+            }
+        }
+
+        // Random Matrix Generator Utility
+        function generateRandomMatrix(rows, cols, min = -8, max = 10) {
+            let mat = [];
+            for (let i = 0; i < rows; i++) {
+                let row = [];
+                for (let j = 0; j < cols; j++) {
+                    row.push(Math.floor(Math.random() * (max - min + 1)) + min);
+                }
+                mat.push(row);
+            }
+            return mat;
+        }
+
+        function onExerciseTypeChange() {
+            generateCurrentExercise();
+        }
+
+        function generateRandomExerciseType() {
+            const types = ['add_2x2', 'sub_2x3', 'scalar_2x4', 'add_3x3', 'compound_2x2', 'undefined_dim'];
+            const randomType = types[Math.floor(Math.random() * types.length)];
+            document.getElementById('exercise-type-select').value = randomType;
+            generateCurrentExercise();
+        }
+
+        function generateCurrentExercise() {
+            const type = document.getElementById('exercise-type-select').value;
+            let ex = {
+                type: type,
+                id: 'ex_' + Date.now(),
+                isUndefined: false,
+                scalar: null,
+                scalar2: null,
+                matA: null,
+                matB: null,
+                op: '+',
+                rows: 2,
+                cols: 2,
+                solution: null,
+                steps: ""
+            };
+
+            if (type === 'add_2x2') {
+                ex.title = "تمرين جمع مصفوفتين (2 × 2)";
+                ex.rows = 2; ex.cols = 2;
+                ex.matA = generateRandomMatrix(2, 2);
+                ex.matB = generateRandomMatrix(2, 2);
+                ex.op = '+';
+                ex.solution = ex.matA.map((row, i) => row.map((val, j) => val + ex.matB[i][j]));
+                ex.steps = `جمع العناصر المتناظرة في الموقع المناظر لكل عنصر في المصفوفتين A و B.`;
+            } 
+            else if (type === 'sub_2x3') {
+                ex.title = "تمرين طرح مصفوفتين (2 × 3)";
+                ex.rows = 2; ex.cols = 3;
+                ex.matA = generateRandomMatrix(2, 3);
+                ex.matB = generateRandomMatrix(2, 3);
+                ex.op = '-';
+                ex.solution = ex.matA.map((row, i) => row.map((val, j) => val - ex.matB[i][j]));
+                ex.steps = `طرح عناصر المصفوفة B من عناصر المصفوفة A المتناظرة مع مراعاة الإشارات.`;
+            }
+            else if (type === 'scalar_2x4') {
+                ex.title = "تمرين ضرب عدد ثابت في مصفوفة (2 × 4)";
+                ex.rows = 2; ex.cols = 4;
+                ex.scalar = Math.floor(Math.random() * 7) - 3;
+                if (ex.scalar === 0 || ex.scalar === 1) ex.scalar = -2;
+                ex.matA = generateRandomMatrix(2, 4);
+                ex.op = '×';
+                ex.solution = ex.matA.map(row => row.map(val => val * ex.scalar));
+                ex.steps = `ضرب العدد الثابت (${ex.scalar}) في جميع عناصر المصفوفة A.`;
+            }
+            else if (type === 'add_3x3') {
+                ex.title = "تمرين جمع مصفوفتين من الرتبة (3 × 3)";
+                ex.rows = 3; ex.cols = 3;
+                ex.matA = generateRandomMatrix(3, 3);
+                ex.matB = generateRandomMatrix(3, 3);
+                ex.op = '+';
+                ex.solution = ex.matA.map((row, i) => row.map((val, j) => val + ex.matB[i][j]));
+                ex.steps = `جمع العناصر المتناظرة لمصفوفتين من الرتبة 3×3.`;
+            }
+            else if (type === 'compound_2x2') {
+                ex.title = "تمرين عملية مركبة 3A - 2B (2 × 2)";
+                ex.rows = 2; ex.cols = 2;
+                ex.scalar = 3;
+                ex.scalar2 = 2;
+                ex.matA = generateRandomMatrix(2, 2, -5, 8);
+                ex.matB = generateRandomMatrix(2, 2, -5, 8);
+                ex.op = '3A - 2B';
+                ex.solution = ex.matA.map((row, i) => row.map((val, j) => (3 * val) - (2 * ex.matB[i][j])));
+                ex.steps = `حساب 3A بضرب عناصر A في 3، ثم 2B بضرب عناصر B في 2، ثم طرح الناتجين.`;
+            }
+            else if (type === 'undefined_dim') {
+                ex.title = "تمرين اختباري: فحص إمكانية إجراء العملية";
+                ex.rows = 2; ex.cols = 2;
+                ex.isUndefined = true;
+                ex.matA = generateRandomMatrix(2, 2);
+                ex.matB = generateRandomMatrix(2, 3);
+                ex.op = '+';
+                ex.steps = `المصفوفة الأولى رتبتها (2×2) والثانية رتبتها (2×3). تعذر الجمع لاختلاف الرتبتين!`;
+            }
+
+            currentExerciseData = ex;
+            renderExerciseWorkspace(ex);
+        }
+
+        function renderExerciseWorkspace(ex) {
+            const container = document.getElementById('exercise-workspace');
+            if (!container) return;
+
+            let html = `
+                <div class="projector-inner-card bg-slate-950 p-4 sm:p-5 rounded-2xl border border-slate-800 space-y-4 sm:space-y-5">
+                    <div class="flex flex-col xs:flex-row justify-between items-start xs:items-center gap-2 border-b border-slate-800 pb-3">
+                        <div class="flex items-center gap-2">
+                            <span class="text-base sm:text-lg">🎯</span>
+                            <h3 class="font-black text-amber-500 text-sm sm:text-base">${ex.title}</h3>
+                        </div>
+                        <span class="text-[11px] sm:text-xs bg-slate-800 text-slate-300 px-2.5 py-1 rounded-full font-mono font-bold">الرتبة: ${ex.rows} × ${ex.cols}</span>
+                    </div>
+
+                    <div class="flex flex-wrap sm:flex-nowrap gap-3 sm:gap-6 justify-center items-center py-3 overflow-x-auto custom-scrollbar max-w-full" style="direction: ltr;">
+            `;
+
+            if (ex.scalar !== null && ex.scalar2 === null) {
+                html += `<div class="text-xl sm:text-2xl font-black text-amber-400 shrink-0">${ex.scalar} ×</div>`;
+            }
+
+            if (ex.scalar2 !== null) {
+                html += `<div class="text-sm font-bold text-amber-400 shrink-0">3 ×</div>`;
+            }
+
+            html += `
+                <div class="flex flex-col items-center shrink-0">
+                    <span class="text-[10px] sm:text-xs text-blue-400 mb-1 font-bold font-mono">Matrix A</span>
+                    ${renderMathMatrix(JSON.stringify(ex.matA))}
+                </div>
+            `;
+
+            if (ex.matB) {
+                const opDisplay = ex.scalar2 !== null ? '-' : ex.op;
+                const bPrefix = ex.scalar2 !== null ? '2 × ' : '';
+                html += `
+                    <div class="text-xl sm:text-2xl font-black text-blue-400 px-1 shrink-0">${opDisplay}</div>
+                    <div class="flex flex-col items-center shrink-0">
+                        <span class="text-[10px] sm:text-xs text-emerald-400 mb-1 font-bold font-mono">${bPrefix}Matrix B</span>
+                        ${renderMathMatrix(JSON.stringify(ex.matB))}
+                    </div>
+                `;
+            }
+
+            html += `
+                <div class="text-xl sm:text-2xl font-black text-slate-400 px-1 shrink-0">=</div>
+                <div class="flex flex-col items-center shrink-0">
+                    <span class="text-[10px] sm:text-xs text-amber-500 mb-1 font-bold font-mono">إجابة الطالب (Result)</span>
+                    <div class="grid gap-1.5 p-1.5 matrix-bracket matrix-bracket-exercise" style="grid-template-columns: repeat(${ex.cols}, minmax(0, 1fr));">
+            `;
+
+            for (let i = 0; i < ex.rows; i++) {
+                for (let j = 0; j < ex.cols; j++) {
+                    html += `<input type="number" id="user_ex_${i}_${j}" placeholder="?" class="w-10 h-10 sm:w-12 sm:h-12 bg-slate-950 border border-slate-700 rounded-lg sm:rounded-xl text-center font-black text-xs sm:text-base text-amber-400 focus:outline-none focus:border-amber-400 transition-all font-mono p-0">`;
+                }
+            }
+
+            html += `
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 pt-3 border-t border-slate-800">
+                <label class="flex items-center gap-2 cursor-pointer text-xs text-rose-300 projector-card bg-rose-950/40 p-2.5 rounded-xl border border-rose-900/50 font-bold">
+                    <input type="checkbox" id="chk-undefined" class="w-4 h-4 rounded text-rose-600 focus:ring-rose-500">
+                    <span>العملية غير معرفة (اختلاف رتبة المصفوفتين)</span>
+                </label>
+
+                <div class="flex gap-2">
+                    <button onclick="showExerciseSolution()" class="flex-1 sm:flex-none px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold rounded-xl transition-all border border-slate-700 active:scale-95">عرض الحل الخطوة بخطوة</button>
+                    <button onclick="checkExerciseAnswer()" class="flex-1 sm:flex-none px-5 py-2 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-black rounded-xl transition-all shadow-lg shadow-emerald-600/30 active:scale-95">تحقق من إجابتك</button>
+                </div>
+            </div>
+
+            <div id="exercise-feedback" class="hidden"></div>
+        </div>
+            `;
+
+            container.innerHTML = html;
+        }
+
+        function renderMathMatrix(jsonStr) {
+            const arr = JSON.parse(jsonStr);
+            const rows = arr.length;
+            const cols = arr[0].length;
+            let html = `<div class="grid gap-1.5 p-1.5 matrix-bracket" style="grid-template-columns: repeat(${cols}, minmax(0, 1fr));">`;
+            for (let i = 0; i < rows; i++) {
+                for (let j = 0; j < cols; j++) {
+                    html += `<div class="w-9 h-9 sm:w-11 sm:h-11 projector-card bg-slate-900 border border-slate-800 rounded-lg sm:rounded-xl flex items-center justify-center font-black text-xs sm:text-sm text-slate-100 font-mono">${arr[i][j]}</div>`;
+                }
+            }
+            html += `</div>`;
+            return html;
+        }
+
+        function checkExerciseAnswer() {
+            const ex = currentExerciseData;
+            if (!ex) return;
+
+            const feedback = document.getElementById('exercise-feedback');
+            const isUndefinedChecked = document.getElementById('chk-undefined').checked;
+            
+            feedback.classList.remove('hidden');
+
+            if (ex.isUndefined) {
+                if (isUndefinedChecked) {
+                    playSuccessSound();
+                    incrementScore();
+                    feedback.className = "mt-4 p-4 sm:p-5 rounded-2xl text-xs sm:text-sm bg-emerald-950/80 border-2 border-emerald-500 text-emerald-200 font-bold space-y-2";
+                    feedback.innerHTML = `
+                        <div class="flex items-center gap-2 text-sm sm:text-base text-emerald-400">
+                            <span>🎉</span>
+                            <span>إجابة صحيحة وممتازة!</span>
+                        </div>
+                        <p class="text-xs font-normal text-emerald-100 leading-relaxed">${ex.steps}</p>
+                    `;
+                } else {
+                    playErrorSound();
+                    feedback.className = "mt-4 p-4 sm:p-5 rounded-2xl text-xs sm:text-sm bg-rose-950/80 border-2 border-rose-500 text-rose-200 font-bold space-y-2";
+                    feedback.innerHTML = `
+                        <div class="flex items-center gap-2 text-sm sm:text-base text-rose-400">
+                            <span>❌</span>
+                            <span>إجابة غير صحيحة!</span>
+                        </div>
+                        <p class="text-xs font-normal text-rose-200 leading-relaxed">العملية غير معرفة لأن المصفوفتين تختلفان في الرتبة. كان يجب تحديد الخيار "العملية غير معرفة".</p>
+                    `;
+                }
+                return;
+            }
+
+            if (isUndefinedChecked) {
+                playErrorSound();
+                feedback.className = "mt-4 p-4 sm:p-5 rounded-2xl text-xs sm:text-sm bg-rose-950/80 border-2 border-rose-500 text-rose-200 font-bold space-y-2";
+                feedback.innerHTML = `
+                    <div class="flex items-center gap-2 text-sm sm:text-base text-rose-400">
+                        <span>❌</span>
+                        <span>إجابة غير صحيحة!</span>
+                    </div>
+                    <p class="text-xs font-normal text-rose-200 leading-relaxed">العملية معرفة ويمكن إجراؤها لأن المصفوفتين تملكان نفس الرتبة تماماً.</p>
+                `;
+                return;
+            }
+
+            let allCorrect = true;
+            for (let i = 0; i < ex.rows; i++) {
+                for (let j = 0; j < ex.cols; j++) {
+                    const input = document.getElementById(`user_ex_${i}_${j}`);
+                    const userVal = parseFloat(input.value);
+                    const expectedVal = ex.solution[i][j];
+
+                    if (isNaN(userVal) || userVal !== expectedVal) {
+                        allCorrect = false;
+                        if (input) {
+                            input.classList.add('border-rose-500', 'bg-rose-950/80', 'text-rose-200');
+                            input.classList.remove('border-emerald-500', 'bg-emerald-950/80', 'text-emerald-200');
+                        }
+                    } else {
+                        if (input) {
+                            input.classList.add('border-emerald-500', 'bg-emerald-950/80', 'text-emerald-200');
+                            input.classList.remove('border-rose-500', 'bg-rose-950/80', 'text-rose-200');
+                        }
+                    }
+                }
+            }
+
+            if (allCorrect) {
+                playSuccessSound();
+                incrementScore();
+                feedback.className = "mt-4 p-4 sm:p-5 rounded-2xl text-xs sm:text-sm bg-emerald-950/90 border-2 border-emerald-500 text-emerald-200 font-bold space-y-2 shadow-2xl";
+                feedback.innerHTML = `
+                    <div class="flex items-center gap-2 text-sm sm:text-base text-emerald-300">
+                        <span>🎉</span>
+                        <span>أحسنت! إجابة صحيحة 100%</span>
+                    </div>
+                    <p class="text-xs font-normal text-emerald-100 leading-relaxed">تم حساب جميع عناصر المصفوفة بشكل صحيح مطابق للرتبة (${ex.rows} × ${ex.cols}). اضغط "توليد مسألة جديدة" لمتابعة التدريب!</p>
+                `;
+            } else {
+                playErrorSound();
+                feedback.className = "mt-4 p-4 sm:p-5 rounded-2xl text-xs sm:text-sm bg-rose-950/90 border-2 border-rose-500 text-rose-200 space-y-2.5 shadow-2xl";
+                feedback.innerHTML = `
+                    <div class="flex items-center gap-2 text-sm sm:text-base font-bold text-rose-400">
+                        <span>❌</span>
+                        <span>توجد بعض الخانات الخاطئة (المظللة بالأحمر)</span>
+                    </div>
+                    <p class="text-xs text-slate-300 leading-relaxed">راجع إشارات الأعداد والعمليات الحسابية لكل موقع ثم حاول مجدداً.</p>
+                `;
+            }
+        }
+
+        function showExerciseSolution() {
+            const ex = currentExerciseData;
+            if (!ex) return;
+
+            const feedback = document.getElementById('exercise-feedback');
+            feedback.classList.remove('hidden');
+            feedback.className = "mt-4 p-4 sm:p-5 rounded-2xl text-xs sm:text-sm projector-inner-card bg-blue-950/80 border border-blue-800 text-blue-200 space-y-3";
+
+            let solMatrixHtml = ex.isUndefined ? `<span class='text-sm sm:text-base font-bold text-rose-400 projector-card bg-rose-950/80 px-4 py-2 rounded-xl border border-rose-800 inline-block'>العملية غير معرفة (تعذر الجمع/الطرح لاختلاف الرتبة)</span>` : renderMathMatrix(JSON.stringify(ex.solution));
+            
+            feedback.innerHTML = `
+                <strong class='text-amber-400 block mb-1 text-center text-sm sm:text-base font-black'>الحل النموذجي المباشر:</strong>
+                <div class='flex justify-center my-2 overflow-x-auto custom-scrollbar p-1'>${solMatrixHtml}</div>
+                <p class='text-xs text-slate-300 projector-card bg-slate-900 p-2.5 rounded-xl border border-slate-800 text-center leading-relaxed font-bold'>💡 <strong>طريقة الحل:</strong> ${ex.steps}</p>
+            `;
+        }
+
+        function incrementScore() {
+            solvedExercisesCount++;
+            const counterEl = document.getElementById('score-counter');
+            if (counterEl) counterEl.textContent = solvedExercisesCount;
+        }
+
+        function copyResult() {
+            const resultView = document.getElementById('matrix-result-view');
+            let text = "";
+            const cells = resultView.children;
+            const rows = parseInt(document.getElementById('matrix-rows').value);
+            const cols = parseInt(document.getElementById('matrix-cols').value);
+            
+            let idx = 0;
+            for (let i = 0; i < rows; i++) {
+                let rowVals = [];
+                for (let j = 0; j < cols; j++) {
+                    if(cells[idx]) rowVals.push(cells[idx].textContent);
+                    idx++;
+                }
+                text += "[ " + rowVals.join("\t") + " ]\n";
+            }
+
+            const textArea = document.createElement("textarea");
+            textArea.value = text;
+            document.body.appendChild(textArea);
+            textArea.select();
+            document.execCommand("copy");
+            document.body.removeChild(textArea);
+            
+            showToast("تم نسخ الناتج بنجاح!", "success");
+        }
+
+        function showToast(msg, type = 'info') {
+            const notification = document.createElement('div');
+            const colorClass = type === 'success' ? 'bg-emerald-600' : type === 'error' ? 'bg-rose-600' : 'bg-blue-600';
+            notification.className = `fixed bottom-5 left-1/2 transform -translate-x-1/2 ${colorClass} text-white px-5 py-2.5 sm:px-6 sm:py-3 rounded-xl shadow-2xl font-black z-50 text-xs sm:text-sm flex items-center gap-2 transition-all duration-300 opacity-0 translate-y-2 whitespace-nowrap`;
+            notification.innerHTML = `<span>${type === 'success' ? '✅' : 'ℹ️'}</span><span>${msg}</span>`;
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.classList.remove('opacity-0', 'translate-y-2');
+            }, 10);
+
+            setTimeout(() => {
+                notification.classList.add('opacity-0', 'translate-y-2');
+                setTimeout(() => notification.remove(), 300);
+            }, 2500);
+        }
+
+        window.onload = function() {
+            updateMatrixDimensions();
+        };
+    </script>
+</body>
+</html>
